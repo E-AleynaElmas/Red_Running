@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CharacterController : MonoBehaviour
 {
@@ -10,15 +12,24 @@ public class CharacterController : MonoBehaviour
     Sprite[] runAnimation;
     [SerializeField]
     Sprite[] jumpAnimation;
+    [SerializeField]
+    Text lifeText;
+    [SerializeField]
+    Image blackBackgorund;
 
     SpriteRenderer spriteRenderer;
 
     int idleAnimCounter = 0;
     int runAnimCounter = 0;
+    int life = 10;
 
     float horizontal = 0;
     float idleAnimTime = 0;
     float runAnimTime = 0;
+
+    float blackBackroundTimer = 0;
+    float mainMenuTimer = 0;
+
     Rigidbody2D physics;
     Vector3 vec;
     bool jumpControl = true;
@@ -29,11 +40,20 @@ public class CharacterController : MonoBehaviour
 
     void Start()
     {
+        Time.timeScale = 1;
+
         spriteRenderer = GetComponent<SpriteRenderer>();
         physics = GetComponent<Rigidbody2D>();
 
         camera = GameObject.FindGameObjectWithTag("MainCamera");
         cameraFirstPos = camera.transform.position - transform.position;
+
+        if (SceneManager.GetActiveScene().buildIndex > PlayerPrefs.GetInt("levelId"))
+        {
+            PlayerPrefs.SetInt("levelId", SceneManager.GetActiveScene().buildIndex);
+        }
+
+        lifeText.text = "RED : " + life;
     }
 
     void Update()
@@ -47,10 +67,23 @@ public class CharacterController : MonoBehaviour
             }
         }
     }
+
     void FixedUpdate()
     {
         CharacterMove();
         Animation();
+        if (life <= 0)
+        {
+            Time.timeScale = 0.4f;
+            lifeText.enabled = false;
+            blackBackroundTimer += 0.03f;
+            blackBackgorund.color = new Color(0, 0, 0, blackBackroundTimer);
+            mainMenuTimer += Time.deltaTime;
+            if(mainMenuTimer > 1)
+            {
+                SceneManager.LoadScene("MainMenu");
+            }
+        }
     }
 
     void LateUpdate()
@@ -63,6 +96,26 @@ public class CharacterController : MonoBehaviour
         jumpControl = true;
     }
 
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if(col.gameObject.tag == "TagBullet")
+        {
+            life--;
+            lifeText.text = "RED : " + life;
+        }
+
+        if(col.gameObject.tag == "TagMac")
+        {
+            life -= 10;
+            lifeText.text = "RED : " + life;
+        }
+
+        if (col.gameObject.tag == "TagSaw")
+        {
+            life -= 10;
+            lifeText.text = "RED : " + life;
+        }
+    }
     void CharacterMove()
     {
         horizontal = Input.GetAxisRaw("Horizontal");

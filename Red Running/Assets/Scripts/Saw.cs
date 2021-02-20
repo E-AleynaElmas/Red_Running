@@ -38,7 +38,7 @@ public class Saw : MonoBehaviour
             distanceControl = false;
         }
         float distance1 = Vector3.Distance(transform.position, pointsToVisit[distanceCounter].transform.position);
-        transform.position += distance * Time.deltaTime * 10;
+        transform.position += distance * Time.deltaTime * 5;
         if (distance1 < 0.5f)
         {
             distanceControl = true;
@@ -69,7 +69,7 @@ public class Saw : MonoBehaviour
         for(int i = 0; i < transform.childCount; i++)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.GetChild(i).transform.position, 1);
+            Gizmos.DrawWireSphere(transform.GetChild(i).transform.position, 0.3f);
         }
 
         for (int i = 0; i < transform.childCount - 1; i++)
